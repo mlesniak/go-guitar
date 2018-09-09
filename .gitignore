@@ -1,2 +1,5 @@
 .idea
 *.iml
+
+# Binary output file
+go-guitar
