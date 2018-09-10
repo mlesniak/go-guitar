@@ -20,10 +20,15 @@ func main() {
 	chk(err)
 	defer stream.Close()
 
+	n := 0
 	chk(stream.Start())
 	for {
 		chk(stream.Read())
 		// TODO ML Display data
+		fmt.Println(n)
+		n++
+
+		// Check if we should exit?
 		select {
 		case <-sig:
 			return
