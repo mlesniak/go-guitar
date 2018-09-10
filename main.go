@@ -16,18 +16,17 @@ func main() {
 	portaudio.Initialize()
 	defer portaudio.Terminate()
 
-	in := make([]int32, 64)
-	stream, err := portaudio.OpenDefaultStream(1, 0, 44100, len(in), in)
+	in := make([]int32, 1024)
+	stream, err := portaudio.OpenDefaultStream(1, 0, 1024, len(in), in)
 	chk(err)
 	defer stream.Close()
 
-	n := 0
 	chk(stream.Start())
 	for {
 		chk(stream.Read())
 		// TODO ML Display data
-		fmt.Println(toHex(in))
-		n++
+		min, max := stats(in)
+		fmt.Println("SAMPLE:", min, max)
 
 		// Check if we should exit?
 		select {
@@ -37,6 +36,24 @@ func main() {
 		}
 	}
 	chk(stream.Stop())
+}
+
+func stats(arr []int32) (int32, int32) {
+	min := arr[0]
+	for _, v := range arr {
+		if v < min {
+			min = v
+		}
+	}
+
+	max := arr[0]
+	for _, v := range arr {
+		if v > max {
+			max = v
+		}
+	}
+
+	return min, max
 }
 
 func toHex(arr []int32) string {
