@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/gordonklaus/portaudio"
 	"os"
@@ -25,7 +26,7 @@ func main() {
 	for {
 		chk(stream.Read())
 		// TODO ML Display data
-		fmt.Println(n)
+		fmt.Println(toHex(in))
 		n++
 
 		// Check if we should exit?
@@ -36,6 +37,15 @@ func main() {
 		}
 	}
 	chk(stream.Stop())
+}
+
+func toHex(arr []int32) string {
+	var buffer bytes.Buffer
+	for _, v := range arr {
+		hex := fmt.Sprintf("%X ", v)
+		buffer.WriteString(hex)
+	}
+	return buffer.String()
 }
 
 func chk(err error) {
