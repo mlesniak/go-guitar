@@ -33,7 +33,7 @@ func main() {
 			renderer.SetDrawColor(0, 0, 0, 255)
 			renderer.Clear()
 			renderer.SetDrawColor(255, 0, 0, 255)
-			arr := make([]int32, 800)
+			arr := make([]int32, 8192)
 			arr[0] = 300
 			for i := range arr {
 				if i > 0 && i < len(arr)-2 {
@@ -45,8 +45,15 @@ func main() {
 				}
 			}
 
+			f := 800 / float32(8192)
 			for i := range arr {
-				renderer.DrawPoint(int32(i), arr[i])
+				// Compute index
+				// 0 -> 0
+				// x -> 800/8192
+				// 8192 -> 800
+
+				x := int(float32(i) * f)
+				renderer.DrawPoint(int32(x), arr[x])
 			}
 			renderer.Present()
 			time.Sleep(100 * time.Millisecond)
