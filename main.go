@@ -18,15 +18,24 @@ func main() {
 
 	in := make([]int32, 1024)
 	stream, err := portaudio.OpenDefaultStream(1, 0, 1024, len(in), in)
-	chk(err)
+	check(err)
 	defer stream.Close()
 
-	chk(stream.Start())
+	//sampleN := 0
+	//f, _ := os.Create("out.csv")
+
+	check(stream.Start())
 	for {
-		chk(stream.Read())
-		// TODO ML Display data
-		min, max := stats(in)
-		fmt.Println("SAMPLE:", min, max)
+		check(stream.Read())
+
+		buffer := new(bytes.Buffer)
+		for i, v := range in {
+			buffer.WriteString(fmt.Sprintf("%d", v))
+			if len(in)-1 != i {
+				buffer.WriteString(",")
+			}
+		}
+		fmt.Println(buffer.String())
 
 		// Check if we should exit?
 		select {
@@ -35,37 +44,10 @@ func main() {
 		default:
 		}
 	}
-	chk(stream.Stop())
+	check(stream.Stop())
 }
 
-func stats(arr []int32) (int32, int32) {
-	min := arr[0]
-	for _, v := range arr {
-		if v < min {
-			min = v
-		}
-	}
-
-	max := arr[0]
-	for _, v := range arr {
-		if v > max {
-			max = v
-		}
-	}
-
-	return min, max
-}
-
-func toHex(arr []int32) string {
-	var buffer bytes.Buffer
-	for _, v := range arr {
-		hex := fmt.Sprintf("%X ", v)
-		buffer.WriteString(hex)
-	}
-	return buffer.String()
-}
-
-func chk(err error) {
+func check(err error) {
 	if err != nil {
 		panic(err)
 	}
