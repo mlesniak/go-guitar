@@ -21,7 +21,7 @@ func main() {
 	check(err)
 	defer stream.Close()
 
-	//sampleN := 0
+	sampleN := 0
 	//f, _ := os.Create("out.csv")
 
 	check(stream.Start())
@@ -30,10 +30,8 @@ func main() {
 
 		buffer := new(bytes.Buffer)
 		for i, v := range in {
-			buffer.WriteString(fmt.Sprintf("%d", v))
-			if len(in)-1 != i {
-				buffer.WriteString(",")
-			}
+			pos := sampleN*len(in) + i
+			buffer.WriteString(fmt.Sprintf("%d,%d\n", pos, v))
 		}
 		fmt.Println(buffer.String())
 
@@ -43,6 +41,8 @@ func main() {
 			return
 		default:
 		}
+
+		sampleN += 1
 	}
 	check(stream.Stop())
 }
