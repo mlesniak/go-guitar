@@ -20,6 +20,12 @@ Write a go program to distinguish between three different guitar chords (Em, Am,
 - what is sampling actually?
 - what does 44100 bits/second actually mean?
 
+# FOR SDL
+
+    brew install sdl2{,_image,_mixer,_ttf,_gfx} pkg-config
+    go get -v github.com/veandco/go-sdl2/{sdl,img,mix,ttf}
+
+
 
 ## References
 
