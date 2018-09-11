@@ -5,6 +5,7 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 	"math/rand"
 	"os"
+	"time"
 )
 
 func main() {
@@ -27,27 +28,33 @@ func main() {
 	}
 	defer renderer.Destroy()
 
-	renderer.Clear()
-	renderer.SetDrawColor(255, 0, 0, 255)
-
-	arr := make([]int32, 800)
-	arr[0] = 300
-	for i, _ := range arr {
-		if i > 0 && i < len(arr)-2 {
-			if rand.Int()%2 == 0 {
-				arr[i] = arr[i-1] + 1
-			} else {
-				arr[i] = arr[i-1] - 1
+	go func() {
+		for true {
+			renderer.SetDrawColor(0, 0, 0, 255)
+			renderer.Clear()
+			renderer.SetDrawColor(255, 0, 0, 255)
+			arr := make([]int32, 800)
+			arr[0] = 300
+			for i := range arr {
+				if i > 0 && i < len(arr)-2 {
+					if rand.Int()%2 == 0 {
+						arr[i] = arr[i-1] + 1
+					} else {
+						arr[i] = arr[i-1] - 1
+					}
+				}
 			}
-		}
-	}
 
-	for i, _ := range arr {
-		renderer.DrawPoint(int32(i), arr[i])
-	}
+			for i := range arr {
+				renderer.DrawPoint(int32(i), arr[i])
+			}
+			renderer.Present()
+			time.Sleep(100 * time.Millisecond)
+		}
+	}()
 
 	fmt.Println("Renderer presenting")
-	renderer.Present()
+
 	fmt.Println("Renderer Waiting")
 
 	// Remembered for later.
