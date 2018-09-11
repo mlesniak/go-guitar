@@ -17,12 +17,13 @@ func main() {
 	defer portaudio.Terminate()
 
 	in := make([]int32, 1024)
-	stream, err := portaudio.OpenDefaultStream(1, 0, 1024, len(in), in)
+	stream, err := portaudio.OpenDefaultStream(1, 0, 8192, len(in), in)
 	check(err)
 	defer stream.Close()
 
 	sampleN := 0
-	//f, _ := os.Create("out.csv")
+	f, _ := os.Create("out.csv")
+	defer f.Close()
 
 	check(stream.Start())
 	for {
@@ -33,7 +34,9 @@ func main() {
 			pos := sampleN*len(in) + i
 			buffer.WriteString(fmt.Sprintf("%d,%d\n", pos, v))
 		}
-		fmt.Println(buffer.String())
+		f.WriteString(buffer.String())
+		//fmt.Println(buffer.String())
+		fmt.Println("#samples", sampleN)
 
 		// Check if we should exit?
 		select {
