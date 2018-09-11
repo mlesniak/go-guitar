@@ -1,6 +1,10 @@
 package main
 
-import "github.com/veandco/go-sdl2/sdl"
+import (
+	"fmt"
+	"github.com/veandco/go-sdl2/sdl"
+	"os"
+)
 
 func main() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
@@ -15,25 +19,33 @@ func main() {
 	}
 	defer window.Destroy()
 
-	surface, err := window.GetSurface()
+	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "Failed to create renderer: %s\n", err)
+		return
 	}
-	surface.FillRect(nil, 0)
+	defer renderer.Destroy()
 
-	rect := sdl.Rect{0, 0, 200, 200}
-	surface.FillRect(&rect, 0xffff0000)
-	window.UpdateSurface()
+	renderer.Clear()
+	renderer.SetDrawColor(255, 255, 255, 255)
+	renderer.DrawPoint(150, 300)
 
-	running := true
-	for running {
-		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch event.(type) {
-			case *sdl.QuitEvent:
-				println("Quit")
-				running = false
-				break
-			}
-		}
-	}
+	fmt.Println("Renderer presenting")
+	renderer.Present()
+	fmt.Println("Renderer Waiting")
+	sdl.Delay(5000)
+	fmt.Println("Renderer Bye")
+
+	// Remembered for later.
+	//running := true
+	//for running {
+	//	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+	//		switch event.(type) {
+	//		case *sdl.QuitEvent:
+	//			println("Quit")
+	//			running = false
+	//			break
+	//		}
+	//	}
+	//}
 }
