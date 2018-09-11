@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
+	"math/rand"
 	"os"
 )
 
@@ -27,25 +28,38 @@ func main() {
 	defer renderer.Destroy()
 
 	renderer.Clear()
-	renderer.SetDrawColor(255, 255, 255, 255)
-	renderer.DrawPoint(150, 300)
+	renderer.SetDrawColor(255, 0, 0, 255)
+
+	arr := make([]int32, 800)
+	arr[0] = 300
+	for i, _ := range arr {
+		if i > 0 && i < len(arr)-2 {
+			if rand.Int()%2 == 0 {
+				arr[i] = arr[i-1] + 1
+			} else {
+				arr[i] = arr[i-1] - 1
+			}
+		}
+	}
+
+	for i, _ := range arr {
+		renderer.DrawPoint(int32(i), arr[i])
+	}
 
 	fmt.Println("Renderer presenting")
 	renderer.Present()
 	fmt.Println("Renderer Waiting")
-	sdl.Delay(5000)
-	fmt.Println("Renderer Bye")
 
 	// Remembered for later.
-	//running := true
-	//for running {
-	//	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-	//		switch event.(type) {
-	//		case *sdl.QuitEvent:
-	//			println("Quit")
-	//			running = false
-	//			break
-	//		}
-	//	}
-	//}
+	running := true
+	for running {
+		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+			switch event.(type) {
+			case *sdl.QuitEvent:
+				println("Quit")
+				running = false
+				break
+			}
+		}
+	}
 }
