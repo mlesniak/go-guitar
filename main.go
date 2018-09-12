@@ -38,12 +38,15 @@ func main() {
 	defer renderer.Destroy()
 
 	// Create buffer for sampling data and open the stream.
-	in := make([]int32, 8192)
+	in := make([]int32, 1024)
 	stream, err := portaudio.OpenDefaultStream(1, 0, 88200, len(in), in)
 	check(err)
 	defer stream.Close()
 
 	check(stream.Start())
+	f := 800 / float32(len(in))
+	amplit := 500000000
+	g := 600 / float32(amplit)
 	for {
 		check(stream.Read())
 
@@ -51,10 +54,6 @@ func main() {
 		renderer.SetDrawColor(0, 0, 0, 255)
 		renderer.Clear()
 		renderer.SetDrawColor(255, 0, 0, 255)
-		f := 800 / float32(len(in))
-
-		amplit := 500000000
-		g := 600 / float32(amplit)
 		for i := range in {
 			x := int(float32(i) * f)
 			y := int32(float32(in[x])*g + 300)
