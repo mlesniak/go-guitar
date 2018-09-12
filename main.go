@@ -6,6 +6,7 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 	"os"
 	"os/signal"
+	"time"
 )
 
 // TODO ML Fix strange window behaivor
@@ -43,10 +44,17 @@ func main() {
 	check(err)
 	defer stream.Close()
 
+	now := time.Now()
+
 	// Read sampleRate/len(in) samples per second.
 	sampleN := 0
 	check(stream.Start())
 	for {
+		if time.Now().Add(1000 * 1000).After(now) {
+			now = time.Now()
+			fmt.Println("tick")
+		}
+
 		check(stream.Read())
 
 		// Render values in window
@@ -55,7 +63,7 @@ func main() {
 		renderer.SetDrawColor(255, 0, 0, 255)
 		f := 800 / float32(len(in))
 
-		amplit := 1000000000
+		amplit := 500000000
 		g := 600 / float32(amplit)
 		for i := range in {
 			x := int(float32(i) * f)
