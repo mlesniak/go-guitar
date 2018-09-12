@@ -6,7 +6,6 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 	"os"
 	"os/signal"
-	"time"
 )
 
 // TODO ML Fix strange window behaivor
@@ -40,21 +39,14 @@ func main() {
 
 	// Create buffer for sampling data and open the stream.
 	in := make([]int32, 8192)
-	stream, err := portaudio.OpenDefaultStream(1, 0, 8192, len(in), in)
+	stream, err := portaudio.OpenDefaultStream(1, 0, 44100, len(in), in)
 	check(err)
 	defer stream.Close()
-
-	now := time.Now()
 
 	// Read sampleRate/len(in) samples per second.
 	sampleN := 0
 	check(stream.Start())
 	for {
-		if time.Now().Add(1000 * 1000).After(now) {
-			now = time.Now()
-			fmt.Println("tick")
-		}
-
 		check(stream.Read())
 
 		// Render values in window
