@@ -39,12 +39,10 @@ func main() {
 
 	// Create buffer for sampling data and open the stream.
 	in := make([]int32, 8192)
-	stream, err := portaudio.OpenDefaultStream(1, 0, 44100, len(in), in)
+	stream, err := portaudio.OpenDefaultStream(1, 0, 88200, len(in), in)
 	check(err)
 	defer stream.Close()
 
-	// Read sampleRate/len(in) samples per second.
-	sampleN := 0
 	check(stream.Start())
 	for {
 		check(stream.Read())
@@ -70,8 +68,6 @@ func main() {
 			return
 		default:
 		}
-
-		sampleN += 1
 	}
 	check(stream.Stop())
 }
