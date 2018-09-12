@@ -8,22 +8,21 @@ import (
 	"os/signal"
 )
 
-// TODO ML Fix strange window behaivor
-// TODO ML Should we use SDL sound functions?
 func main() {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, os.Kill)
 	fmt.Println("Starting recording, press CTRL+C to abort.")
 
+	// Initialize visualization library.
+	if err := sdl.Init(sdl.INIT_VIDEO); err != nil {
+		panic(err)
+	}
+	defer sdl.Quit()
+
 	// Initialize audio library.
 	portaudio.Initialize()
 	defer portaudio.Terminate()
 
-	// Initialize visualization library.
-	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
-		panic(err)
-	}
-	defer sdl.Quit()
 	window, err := sdl.CreateWindow("go guitar", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		800, 600, sdl.WINDOW_SHOWN)
 	if err != nil {
@@ -60,6 +59,14 @@ func main() {
 			renderer.DrawPoint(int32(x), y)
 		}
 		renderer.Present()
+
+		// See https://stackoverflow.com/questions/39637824/border-titlebar-not-properly-displaying-in-sdl-osx
+		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+			switch event.(type) {
+			case *sdl.QuitEvent:
+				return
+			}
+		}
 
 		// Check if we should exit?
 		select {
