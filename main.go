@@ -12,6 +12,11 @@ import (
 const width = 800
 const height = 800
 
+// Factors to shrink the measured data with large integers into the window.
+const widthFactor = width / float32(bufferSize)
+const maxAmplitude = 500000000
+const heightFactor = height / float32(maxAmplitude)
+
 // Global constants for audio recording
 const bufferSize = 1024
 const sampleRate = 88200
@@ -41,12 +46,9 @@ func main() {
 	defer stream.Close()
 
 	check(stream.Start())
-	f := width / float32(len(in))
-	amplit := 500000000
-	g := height / float32(amplit)
 	for {
 		check(stream.Read())
-		drawVoice(renderer, in, f, g)
+		drawVoice(renderer, in)
 
 		if checkForExit(sig) {
 			return
@@ -55,13 +57,13 @@ func main() {
 	check(stream.Stop())
 }
 
-func drawVoice(renderer *sdl.Renderer, in []int32, widthFactor float32, heightFsctor float32) {
+func drawVoice(renderer *sdl.Renderer, in []int32) {
 	renderer.SetDrawColor(0, 0, 0, 255)
 	renderer.Clear()
 	renderer.SetDrawColor(255, 0, 0, 255)
 	for i := range in {
 		x := int(float32(i) * widthFactor)
-		y := int32(float32(in[x])*heightFsctor + height/2)
+		y := int32(float32(in[x])*heightFactor + height/2)
 		renderer.DrawPoint(int32(x), y)
 	}
 	renderer.Present()
