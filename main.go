@@ -58,15 +58,7 @@ func main() {
 		check(stream.Read())
 
 		// Render values in window
-		renderer.SetDrawColor(0, 0, 0, 255)
-		renderer.Clear()
-		renderer.SetDrawColor(255, 0, 0, 255)
-		for i := range in {
-			x := int(float32(i) * f)
-			y := int32(float32(in[x])*g + height/2)
-			renderer.DrawPoint(int32(x), y)
-		}
-		renderer.Present()
+		drawVoice(renderer, in, f, g)
 
 		// See https://stackoverflow.com/questions/39637824/border-titlebar-not-properly-displaying-in-sdl-osx
 		var event sdl.Event
@@ -90,6 +82,18 @@ func main() {
 		}
 	}
 	check(stream.Stop())
+}
+
+func drawVoice(renderer *sdl.Renderer, in []int32, widthFactor float32, heightFsctor float32) {
+	renderer.SetDrawColor(0, 0, 0, 255)
+	renderer.Clear()
+	renderer.SetDrawColor(255, 0, 0, 255)
+	for i := range in {
+		x := int(float32(i) * widthFactor)
+		y := int32(float32(in[x])*heightFsctor + height/2)
+		renderer.DrawPoint(int32(x), y)
+	}
+	renderer.Present()
 }
 
 // Helper function to check on any error.
