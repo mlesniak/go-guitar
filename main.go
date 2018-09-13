@@ -25,29 +25,19 @@ func main() {
 	portaudio.Initialize()
 	defer portaudio.Terminate()
 
-	// Initialize visualization library.
-	if err := sdl.Init(sdl.INIT_VIDEO); err != nil {
-		panic(err)
-	}
+	// Initialize graphics part.
+	check(sdl.Init(sdl.INIT_VIDEO))
 	defer sdl.Quit()
-
 	window, err := sdl.CreateWindow("Go guitar", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		width, height, sdl.WINDOW_SHOWN)
-	if err != nil {
-		panic(err)
-	}
+	check(err)
 	defer window.Destroy()
 	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_ACCELERATED)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create renderer: %s\n", err)
-		return
-	}
 	defer renderer.Destroy()
 
 	// Create buffer for sampling data and open the stream.
 	in := make([]int32, bufferSize)
 	stream, err := portaudio.OpenDefaultStream(1, 0, sampleRate, len(in), in)
-	check(err)
 	defer stream.Close()
 
 	check(stream.Start())
@@ -63,6 +53,18 @@ func main() {
 		}
 	}
 	check(stream.Stop())
+}
+
+func drawVoice(renderer *sdl.Renderer, in []int32, widthFactor float32, heightFsctor float32) {
+	renderer.SetDrawColor(0, 0, 0, 255)
+	renderer.Clear()
+	renderer.SetDrawColor(255, 0, 0, 255)
+	for i := range in {
+		x := int(float32(i) * widthFactor)
+		y := int32(float32(in[x])*heightFsctor + height/2)
+		renderer.DrawPoint(int32(x), y)
+	}
+	renderer.Present()
 }
 
 func checkForExit(sig chan os.Signal) bool {
@@ -86,18 +88,6 @@ func checkForExit(sig chan os.Signal) bool {
 	default:
 	}
 	return false
-}
-
-func drawVoice(renderer *sdl.Renderer, in []int32, widthFactor float32, heightFsctor float32) {
-	renderer.SetDrawColor(0, 0, 0, 255)
-	renderer.Clear()
-	renderer.SetDrawColor(255, 0, 0, 255)
-	for i := range in {
-		x := int(float32(i) * widthFactor)
-		y := int32(float32(in[x])*heightFsctor + height/2)
-		renderer.DrawPoint(int32(x), y)
-	}
-	renderer.Present()
 }
 
 // Helper function to check on any error.
