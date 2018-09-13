@@ -56,32 +56,36 @@ func main() {
 	g := height / float32(amplit)
 	for {
 		check(stream.Read())
-
-		// Render values in window
 		drawVoice(renderer, in, f, g)
 
-		// See https://stackoverflow.com/questions/39637824/border-titlebar-not-properly-displaying-in-sdl-osx
-		var event sdl.Event
-		for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch t := event.(type) {
-			case *sdl.QuitEvent:
-				return
-			case *sdl.KeyboardEvent:
-				if t.Keysym.Sym == 27 {
-					// Quit on Escape key.
-					return
-				}
-			}
-		}
-
-		// Check if we should exit?
-		select {
-		case <-sig:
+		if checkForExit(sig) {
 			return
-		default:
 		}
 	}
 	check(stream.Stop())
+}
+
+func checkForExit(sig chan os.Signal) bool {
+	// See https://stackoverflow.com/questions/39637824/border-titlebar-not-properly-displaying-in-sdl-osx
+	var event sdl.Event
+	for event = sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+		switch t := event.(type) {
+		case *sdl.QuitEvent:
+			return true
+		case *sdl.KeyboardEvent:
+			if t.Keysym.Sym == 27 {
+				// Quit on Escape key.
+				return true
+			}
+		}
+	}
+	// Check if we should exit?
+	select {
+	case <-sig:
+		return true
+	default:
+	}
+	return false
 }
 
 func drawVoice(renderer *sdl.Renderer, in []int32, widthFactor float32, heightFsctor float32) {
