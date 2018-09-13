@@ -19,7 +19,7 @@ const heightFactor = height / float32(maxAmplitude)
 
 // Global constants for audio recording
 const bufferSize = 1024
-const sampleRate = 88200
+const sampleRate = 44100
 
 func main() {
 	sig := make(chan os.Signal, 1)
